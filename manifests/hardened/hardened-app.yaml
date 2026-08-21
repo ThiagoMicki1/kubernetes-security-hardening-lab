@@ -1,0 +1,181 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hardened-demo
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: webapp-config
+  namespace: hardened-demo
+data:
+  APP_ENV: "demo"
+  LOG_LEVEL: "info"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: webapp-secret
+  namespace: hardened-demo
+type: Opaque
+stringData:
+  API_TOKEN: "REPLACE_WITH_LOCAL_LAB_VALUE_ONLY"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: webapp-sa
+  namespace: hardened-demo
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: webapp-config-reader
+  namespace: hardened-demo
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["webapp-config"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: webapp-config-reader
+  namespace: hardened-demo
+subjects:
+  - kind: ServiceAccount
+    name: webapp-sa
+    namespace: hardened-demo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: webapp-config-reader
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hardened-webapp
+  namespace: hardened-demo
+  labels:
+    app: hardened-webapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hardened-webapp
+  template:
+    metadata:
+      labels:
+        app: hardened-webapp
+    spec:
+      serviceAccountName: webapp-sa
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: web
+          image: nginxinc/nginx-unprivileged:1.29-alpine
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: webapp-config
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          volumeMounts:
+            - name: cache
+              mountPath: /var/cache/nginx
+            - name: run
+              mountPath: /var/run
+            - name: tmp
+              mountPath: /tmp
+            - name: app-secret
+              mountPath: /etc/webapp-secrets
+              readOnly: true
+      volumes:
+        - name: cache
+          emptyDir: {}
+        - name: run
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+        - name: app-secret
+          secret:
+            secretName: webapp-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hardened-webapp
+  namespace: hardened-demo
+spec:
+  type: ClusterIP
+  selector:
+    app: hardened-webapp
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-and-webapp-ingress
+  namespace: hardened-demo
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-webapp-from-namespace
+  namespace: hardened-demo
+spec:
+  podSelector:
+    matchLabels:
+      app: hardened-webapp
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 8080

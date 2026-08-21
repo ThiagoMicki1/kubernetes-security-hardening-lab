@@ -1,0 +1,44 @@
+Sample KubeLinter output
+=========================
+
+Command:
+kube-linter lint manifests/insecure
+
+Example findings from the intentionally insecure manifest:
+
+manifests/insecure/insecure-app.yaml: object: insecure-demo/insecure-webapp apps/v1, Kind=Deployment
+host system directory "/var/run/docker.sock" is mounted on container "web"
+
+manifests/insecure/insecure-app.yaml: object: insecure-demo/insecure-webapp apps/v1, Kind=Deployment
+container "web" does not drop capability "NET_RAW"
+
+manifests/insecure/insecure-app.yaml: object: insecure-demo/insecure-webapp apps/v1, Kind=Deployment
+container image "nginx:latest" uses the latest tag
+
+manifests/insecure/insecure-app.yaml: object: insecure-demo/insecure-webapp apps/v1, Kind=Deployment
+container "web" does not have a read-only root filesystem
+
+manifests/insecure/insecure-app.yaml: object: insecure-demo/insecure-webapp apps/v1, Kind=Deployment
+container "web" has allowPrivilegeEscalation set to true
+
+manifests/insecure/insecure-app.yaml: object: insecure-demo/insecure-webapp apps/v1, Kind=Deployment
+container "web" is privileged
+
+manifests/insecure/insecure-app.yaml: object: insecure-demo/insecure-webapp apps/v1, Kind=Deployment
+container "web" is not set to runAsNonRoot
+
+manifests/insecure/insecure-app.yaml: object: insecure-demo/insecure-webapp apps/v1, Kind=Deployment
+container "web" has cpu request 0
+
+manifests/insecure/insecure-app.yaml: object: insecure-demo/insecure-webapp apps/v1, Kind=Deployment
+container "web" has memory limit 0
+
+Why this matters:
+These findings show common Kubernetes risks that can increase blast radius if a container is compromised.
+
+Command:
+kube-linter lint manifests/hardened
+
+Expected hardened result:
+KubeLinter 0.8.3
+No lint errors found.

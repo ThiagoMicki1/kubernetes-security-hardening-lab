@@ -1,0 +1,21 @@
+# Local Kubernetes files
+kubeconfig
+*.kubeconfig
+.kube/
+.minikube/
+.kind/
+
+# Generated scan output
+*.sarif
+*.tmp
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Python/cache files from local scanner installs
+.venv/
+__pycache__/
+*.pyc

@@ -1,0 +1,42 @@
+Sample Checkov output
+=====================
+
+Command:
+checkov -d manifests/insecure --framework kubernetes
+
+Example findings from the intentionally insecure manifest:
+
+FAILED CKV_K8S_25: "Minimize the admission of containers with added capability"
+File: manifests/insecure/insecure-app.yaml
+
+FAILED CKV_K8S_39: "Do not use the CAP_SYS_ADMIN linux capability"
+File: manifests/insecure/insecure-app.yaml
+
+FAILED CKV_K8S_20: "Containers should not run with allowPrivilegeEscalation"
+File: manifests/insecure/insecure-app.yaml
+
+FAILED CKV_K8S_27: "Do not expose the docker daemon socket to containers"
+File: manifests/insecure/insecure-app.yaml
+
+FAILED CKV_K8S_22: "Use read-only filesystem for containers where possible"
+File: manifests/insecure/insecure-app.yaml
+
+FAILED CKV_K8S_23: "Minimize the admission of root containers"
+File: manifests/insecure/insecure-app.yaml
+
+FAILED CKV_K8S_16: "Container should not be privileged"
+File: manifests/insecure/insecure-app.yaml
+
+FAILED CKV_K8S_8: "Liveness Probe Should be Configured"
+File: manifests/insecure/insecure-app.yaml
+
+FAILED CKV_K8S_9: "Readiness Probe Should be Configured"
+File: manifests/insecure/insecure-app.yaml
+
+Command:
+checkov -d manifests/hardened --framework kubernetes --config-file .checkov.yml
+
+Expected hardened result:
+kubernetes scan results:
+
+Passed checks: 104, Failed checks: 0, Skipped checks: 0

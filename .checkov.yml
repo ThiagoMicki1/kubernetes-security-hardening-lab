@@ -1,0 +1,9 @@
+framework:
+  - kubernetes
+quiet: true
+compact: true
+skip-check:
+  # Portfolio lab tradeoff: use a readable version tag, discuss digest pinning in docs.
+  - CKV_K8S_43
+skip-path:
+  - reports

@@ -1,0 +1,42 @@
+name: Kubernetes Security Hardening Lab
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-scan:
+    name: Validate and scan manifests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install KubeLinter
+        run: |
+          curl -sSL -o kube-linter.tar.gz https://github.com/stackrox/kube-linter/releases/download/v0.8.3/kube-linter-linux.tar.gz
+          tar -xzf kube-linter.tar.gz
+          sudo mv kube-linter /usr/local/bin/kube-linter
+          kube-linter version
+
+      - name: Scan hardened manifests with KubeLinter
+        run: kube-linter lint manifests/hardened
+
+      - name: Scan insecure examples with KubeLinter
+        run: kube-linter lint manifests/insecure || true
+
+      - name: Run Checkov on hardened manifests
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: manifests/hardened
+          framework: kubernetes
+          config_file: .checkov.yml
+          quiet: true
+          compact: true
