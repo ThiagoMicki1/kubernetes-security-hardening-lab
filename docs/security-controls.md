@@ -111,6 +111,8 @@ This project never uses real secrets. In real environments, secrets should be ma
 
 The hardened deployment mounts the Secret as a read-only file instead of passing it as an environment variable. This is a safer pattern because environment variables are often easier to expose through debug output, process inspection, or crash reports.
 
+The hardened Secret volume also sets `defaultMode: 0440` so the mounted file is not world-readable inside the pod.
+
 ## Image Tag Pinning
 
 The insecure manifest uses `nginx:latest`, which can change unexpectedly.

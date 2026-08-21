@@ -36,6 +36,7 @@ kubernetes-security-hardening-lab/
 ├── .github/workflows/
 │   └── kubernetes-security.yml
 ├── docs/
+│   ├── decisions.md
 │   └── security-controls.md
 ├── manifests/
 │   ├── hardened/
@@ -87,6 +88,8 @@ kubernetes-security-hardening-lab/
 - Versioned container image tag
 
 More detail is in [docs/security-controls.md](docs/security-controls.md).
+
+Design notes are in [docs/decisions.md](docs/decisions.md).
 
 ## Local Validation
 
@@ -164,6 +167,12 @@ I also learned that scanner output needs human review. A scanner can point out r
 ## What I Struggled With
 
 The hardest part was keeping the lab simple. It is tempting to add Helm, admission controllers, policy engines, and a full cluster setup, but that would make the repo harder to understand. I kept it to plain YAML so the security controls are easy to see.
+
+## Interview Talking Points
+
+- Why `privileged: true`, `hostPath`, and Docker socket mounts are high-risk.
+- How the hardened manifest reduces blast radius with non-root, dropped capabilities, and read-only filesystem settings.
+- Why the NetworkPolicy is intentionally strict in the lab and what egress rules a real app might need.
 
 ## Future Improvements
 
