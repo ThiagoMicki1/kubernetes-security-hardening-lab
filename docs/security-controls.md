@@ -78,6 +78,8 @@ The hardened app uses a named service account and a small Role that can only `ge
 
 This demonstrates least privilege: the workload should only have the Kubernetes API permissions it actually needs.
 
+This RBAC Role is illustrative because `automountServiceAccountToken: false` means the pod cannot actually use the Kubernetes API token unless that setting is intentionally changed.
+
 ## Avoid Default Service Account Usage
 
 The hardened deployment uses:
