@@ -95,6 +95,8 @@ Avoiding the default service account makes permissions easier to reason about. D
 
 The hardened manifests include a default deny NetworkPolicy and a second policy that allows traffic to the web app only from pods in the same namespace.
 
+The default deny policy blocks egress too, which is fine for this demo, but a real app may need explicit DNS or API egress rules.
+
 NetworkPolicy is useful because Kubernetes networking is often open by default unless a compatible network plugin enforces policies.
 
 ## Safe Placeholder Secret

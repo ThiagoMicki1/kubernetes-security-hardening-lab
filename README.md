@@ -65,7 +65,7 @@ kubernetes-security-hardening-lab/
 | Health checks | No probes | Includes readiness and liveness probes |
 | Service account | Uses default behavior | Uses a named service account |
 | RBAC | No least-privilege example | Restricted Role and RoleBinding |
-| Network controls | No NetworkPolicy | Default deny plus limited ingress |
+| Network controls | No NetworkPolicy | Default deny ingress and egress, plus limited ingress |
 | Image tag | Uses `latest` | Uses a versioned unprivileged image and documents digest pinning |
 
 ## Included Kubernetes Security Controls
