@@ -5,6 +5,12 @@ kubeconfig
 .minikube/
 .kind/
 
+# Local secrets and keys
+.env
+*.env
+*.pem
+*.key
+
 # Generated scan output
 *.sarif
 *.tmp
