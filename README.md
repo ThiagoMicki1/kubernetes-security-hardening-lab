@@ -37,6 +37,7 @@ kubernetes-security-hardening-lab/
 │   └── kubernetes-security.yml
 ├── docs/
 │   ├── decisions.md
+│   ├── local-kind-walkthrough.md
 │   └── security-controls.md
 ├── manifests/
 │   ├── hardened/
@@ -140,6 +141,8 @@ kubectl delete namespace hardened-demo
 
 The insecure manifests are included for learning and scanner comparison. They are intentionally unsafe.
 
+A safer step-by-step local cluster walkthrough is available in [docs/local-kind-walkthrough.md](docs/local-kind-walkthrough.md).
+
 ## GitHub Actions
 
 The workflow in `.github/workflows/kubernetes-security.yml`:
@@ -176,7 +179,6 @@ The hardest part was keeping the lab simple. It is tempting to add Helm, admissi
 
 ## Future Improvements
 
-- Add a local kind-based walkthrough for people who want to test the hardened manifest safely.
 - Add a small policy-as-code example with OPA Gatekeeper or Kyverno once the plain YAML version is fully understood.
 
 ## Safety Notes
